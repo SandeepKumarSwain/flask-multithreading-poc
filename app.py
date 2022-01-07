@@ -10,12 +10,12 @@ app.secret_key = os.urandom(42)
 # Define a global variable to store the current status of all threads
 status = {}
 
-def threaded_task(duration, thread_key):
+def threaded_task(task_count, thread_key):
     ''' Main thread function that run the thread process '''
     global status
-    for i in range(duration):
-        print("Working...{} {}/{}".format(thread_key, i + 1, duration))
-        status[str(thread_key)] +=1
+    for task_no in range(task_count):
+        print("Thread {},Working on task {}/{}".format(thread_key, task_no, task_count))
+        status[str(thread_key)] = task_no
         time.sleep(5)
 
 
@@ -23,18 +23,22 @@ def threaded_task(duration, thread_key):
 def start():
     ''' Starts a process '''
     global status
+    #Define total task to be executed
+    TOTAL_TASK_COUNT = 100
+    #initializing the thread
     thread_key = uuid.uuid1()
-    thread = Thread(target=threaded_task, args=(100,thread_key,))
+    thread = Thread(target=threaded_task, args=(TOTAL_TASK_COUNT,thread_key,))
     thread.daemon = True
+    #starting the thread
     thread.start()
-    status[str(thread_key)] = 0
+    # returning to the page while the thread is running in background
     res = {'thread_key': str(thread_key), 'thread_name': str(thread.name)}
     return render_template('index.html', value=res)
 
 @app.route("/status/<string:thread_key>")
 def current_status(thread_key):
-    return jsonify({'thread_key': thread_key,
-                    'status': status[thread_key]})
+    thread_current_status = status[thread_key]
+    return jsonify({'status': thread_current_status})
 
 if __name__ == '__main__':
     app.run(debug=True)
