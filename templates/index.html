@@ -1,0 +1,81 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Flask Multi-Threading Using jQuery AJAX</title>
+    <meta charset="utf-8"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+    <style>
+        body {
+            padding: 50px 150px;
+        }
+        h1, h2, h3 {
+            text-align: center;
+            color: #000;
+            margin: 5px 0;
+        }
+
+        h1 {
+            font-size: 30px;
+        }
+
+        .container {
+            width: 800px;
+            margin: auto;
+            font-size: 25px;
+        }
+
+        .container #content {
+            border: dashed 2px #CCC;
+            padding: 10px;
+        }
+
+        #viewContent {
+            padding-left: 20px;
+        }
+
+        #viewContent h4 {
+            margin: 10px 0;
+        }
+
+        #viewContent .textAlignCenter {
+            text-align: center;
+        }
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="content">
+        <div id="viewContent">
+            <h1>Flask Multi-Threading POC</h1>
+            <p>Thread Started: <span id="thread_id">{{value['thread_key']}}</span></p>
+            <h4>Current Process</h4>
+            <div id="message"></div>
+        </div>
+    </div>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+        function run_ajax() {
+                $.ajax({
+                    type: "GET",
+                    url: "/status/" + $("#thread_id").text(),
+                    dataType: "json",
+                    success: function (result, status, xhr) {
+                        var table = $("<p>" + result['status'] + "</p>");
+
+                        $("#message").html(table);
+                    },
+                    error: function (xhr, status, error) {
+                        alert("Result: " + status + " " + error + " " + xhr.status + " " + xhr.statusText)
+                    }
+                });
+                setTimeout(run_ajax, 5000);
+
+        };
+        run_ajax()
+    });
+</script>
+</body>
+</html>
